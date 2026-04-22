@@ -50,6 +50,53 @@ router.get('/profile', verifyToken, async (req, res) => {
 });
 
 
+// login route
+
+// 3. Login Route
+router.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // 1. Validate input
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Email and password are required' });
+        }
+
+        // 2. Find user by email
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+
+        // 3. Compare passwords using bcrypt
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+
+        // 4. Generate JWT token
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            process.env.JWT_SECRET || 'YOUR_SECRET_KEY',
+            { expiresIn: '1d' }
+        );
+
+        // 5. Return success response
+        res.status(200).json({
+            token,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            message: 'Login successful'
+        });
+
+    } catch (error) {
+        console.error('Login Error:', error);
+        res.status(500).json({ message: 'Server error during login' });
+    }
+});
+
+
 router.post('/register', async (req, res) => {
     try {
         const { name, email, studentId, password } = req.body;
