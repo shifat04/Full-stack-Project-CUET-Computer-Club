@@ -290,7 +290,43 @@ body.light-mode .navbar {
     transform: rotate(-45deg) translate(8px, -8px);
 }
 
-/* ==================== BUTTONS ==================== */
+/* ==================== BUTTONS ==================== *
+/
+
+
+
+/* Profile Button in Navbar */
+.btn-profile {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid var(--primary-color);
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: 8px;
+    color: var(--light-text);
+    font-weight: 600;
+    transition: all var(--transition-fast);
+}
+
+.btn-profile:hover {
+    background: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+}
+
+.btn-profile::after {
+    display: none;
+}
+
+.profile-icon {
+    font-size: 1.2rem;
+}
+
+
+
+
+
 
 .btn {
     display: inline-block;

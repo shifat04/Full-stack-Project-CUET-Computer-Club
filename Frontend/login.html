@@ -103,13 +103,14 @@
     </button>
 
     <!-- ==================== SCRIPT ==================== -->
-    <script src="js/script.js"></script>
+     <script src="./js/script.js"></script>
+    <!-- ==================== SCRIPT ==================== -->
     <script>
         // Login form submission
         const loginForm = document.getElementById('loginForm');
 
         if (loginForm) {
-            loginForm.addEventListener('submit', (e) => {
+            loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
                 const email = document.getElementById('email').value;
@@ -121,25 +122,45 @@
                     return;
                 }
 
-                // Email validation
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(email)) {
-                    alert('Please enter a valid email address!');
-                    return;
+                try {
+                    // 1. Send the login request to the backend
+                    const response = await fetch('http://localhost:5000/api/auth/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email, password })
+                    });
+
+                    const data = await response.json();
+
+                    // 2. Check if login was successful
+                    if (response.ok) {
+                        // Save the JWT token in local storage for future authenticated requests
+                        localStorage.setItem('token', data.token);
+                        localStorage.setItem('userName', data.name);
+                        localStorage.setItem('userRole', data.role);
+                        
+                        alert(`Welcome back, ${data.name}!`);
+
+                        // 3. Redirect based on the user's role
+                        if (data.role === 'admin') {
+                            window.location.href = 'admin_dashboard.html'; // Create this page if you haven't yet
+                        } else {
+                            window.location.href = 'member_dashboard.html'; // Create this page if you haven't yet
+                        }
+                    } else {
+                        // If login failed (e.g., wrong password, user not found)
+                        alert(data.message || 'Login failed! Please check your credentials.');
+                    }
+                } catch (error) {
+                    console.error('Error during login:', error);
+                    alert('Server error! Could not connect to the backend.');
                 }
-
-                // Success message (in a real app, you would authenticate with a server)
-                alert(`Welcome back! Logging in as ${email}`);
-
-                // Reset form
-                loginForm.reset();
-
-                // Note: To actually authenticate users, you would need to:
-                // 1. Use a backend service like Firebase Auth, Auth0, or your own API
-                // 2. Send credentials to server for verification
-                // 3. Handle JWT tokens or sessions
             });
         }
     </script>
+
+
 </body>
 </html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Dashboard - CUET Computer Club</title>
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- This script runs first to protect the page from unlogged users -->
+    <script src="js/protect_member.js"></script>
+    
+    <style>
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 30px; }
+        .dash-card { background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border-color); border-radius: 15px; padding: 25px; backdrop-filter: blur(10px); }
+        .dash-card h3 { color: var(--primary-color); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .profile-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
+        .list-item { padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--primary-color); }
+        .resource-link { display: block; padding: 12px; background: var(--border-color); color: var(--light-text); text-decoration: none; border-radius: 8px; margin-bottom: 10px; transition: 0.3s; }
+        .resource-link:hover { background: var(--primary-color); }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <a href="index.html" class="logo">
+                    <span class="logo-text">Member Portal</span>
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">Main Website</a></li>
+                <li><a href="#" id="logoutBtn" class="btn btn-primary" style="background: var(--error-color); padding: 8px 15px;">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <section class="section-container" style="padding-top: 50px; padding-bottom: 50px;">
+        <div class="section-header" style="text-align: left;">
+            <h2 class="section-title">Welcome back, <span id="welcomeName" class="gradient-text">Member</span>!</h2>
+            <p class="section-subtitle">Here is your personal club overview.</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- 1. PROFILE INFO -->
+            <div class="dash-card">
+                <h3>👤 My Profile</h3>
+                <div class="profile-row">
+                    <span style="color: var(--muted-text);">Email:</span>
+                    <strong id="profileEmail">Loading...</strong>
+                </div>
+                <div class="profile-row">
+                    <span style="color: var(--muted-text);">Student ID:</span>
+                    <strong id="profileId">Loading...</strong>
+                </div>
+                <div class="profile-row">
+                    <span style="color: var(--muted-text);">Member Since:</span>
+                    <strong id="profileDate">Loading...</strong>
+                </div>
+                <button class="btn btn-secondary" style="width: 100%; margin-top: 15px; padding: 8px;">Edit Profile</button>
+            </div>
+
+            <!-- 2. CLUB RESOURCES -->
+            <div class="dash-card">
+                <h3>💻 Club Resources</h3>
+                <p style="color: var(--muted-text); margin-bottom: 15px; font-size: 0.9rem;">Exclusive links for registered members only.</p>
+                <a href="https://github.com/shifat04" target="_blank" class="resource-link">🐙 Official GitHub Repository</a>
+                <a href="#" class="resource-link">📁 Workshop Presentation Drive</a>
+                <a href="#" class="resource-link">💬 Join Slack Community</a>
+                <a href="#" class="resource-link">🎥 Past Event Recordings</a>
+            </div>
+
+            <!-- 3. MY EVENTS -->
+            <div class="dash-card" style="grid-column: 1 / -1;">
+                <h3>📅 My Events</h3>
+                <div id="myEventsList">
+                    <div class="list-item">
+                        <div style="display: flex; justify-content: space-between;">
+                            <h4>Web Development Masterclass</h4>
+                            <span class="tag" style="background: rgba(16, 185, 129, 0.2); color: var(--success-color);">Registered</span>
+                        </div>
+                        <p style="color: var(--muted-text); font-size: 0.9rem; margin-top: 5px;">Date: March 15, 2026 | Location: Auditorium Hall</p>
+                    </div>
+                </div>
+                <p style="text-align: center; margin-top: 15px;"><a href="index.html#events" style="color: var(--primary-color);">Browse more events</a></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- DASHBOARD SCRIPT -->
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const token = localStorage.getItem('token');
+        const userName = localStorage.getItem('userName');
+        
+        // 1. Set Welcome Name immediately from local storage
+        if (userName) {
+            document.getElementById('welcomeName').innerText = userName.split(' ')[0]; // Gets first name
+        }
+
+        // 2. Handle Logout
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.clear(); // Clears token and user data
+            window.location.href = 'login.html';
+        });
+
+        // 3. Fetch Profile Data from Backend to replace "Loading..."
+        async function loadProfile() {
+            try {
+                const res = await fetch('http://localhost:5000/api/auth/profile', {
+                    method: 'GET',
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (res.ok) {
+                    const userData = await res.json();
+                    
+                    // Inject the real data into the HTML elements
+                    document.getElementById('profileEmail').innerText = userData.email || 'N/A';
+                    document.getElementById('profileId').innerText = userData.studentId || 'N/A';
+                    
+                    if (userData.createdAt) {
+                        document.getElementById('profileDate').innerText = new Date(userData.createdAt).toLocaleDateString();
+                    } else {
+                        document.getElementById('profileDate').innerText = "Unknown";
+                    }
+                } else {
+                    console.error('Session expired or invalid token');
+                    localStorage.clear();
+                    window.location.href = 'login.html';
+                }
+            } catch (err) {
+                console.error('Error fetching profile. Is the backend running?', err);
+                document.getElementById('profileEmail').innerText = "Server Error";
+                document.getElementById('profileId').innerText = "Server Error";
+                document.getElementById('profileDate').innerText = "Server Error";
+            }
+        }
+
+        // Trigger the fetch when page loads
+        loadProfile();
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Control Room - CUET Computer Club</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/protect_admin.js"></script>
+    <style>
+        .admin-grid { display: grid; grid-template-columns: 1fr; gap: 30px; margin-top: 20px; }
+        .admin-panel { background: rgba(30, 41, 59, 0.7); padding: 25px; border-radius: 15px; border: 1px solid var(--border-color); backdrop-filter: blur(10px); }
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; color: var(--light-text); }
+        .admin-table th, .admin-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .admin-table th { background: rgba(99, 102, 241, 0.1); color: var(--primary-color); }
+        .action-btn { padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; color: white; margin-right: 5px; }
+        .btn-promote { background: var(--success-color); }
+        .btn-delete { background: var(--error-color); }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .full-width { grid-column: span 2; }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <a href="index.html" class="logo">
+                    <span class="logo-text">Admin Control Room</span>
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">Main Website</a></li>
+                <li><a href="#" id="logoutBtn" class="btn btn-primary" style="background: var(--error-color); padding: 8px 15px;">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <section class="section-container" style="padding-top: 50px; padding-bottom: 50px;">
+        <h2 class="section-title">Dashboard Overview</h2>
+
+        <!-- 1. CLUB STATISTICS -->
+        <div class="stats-container" style="margin: 0 0 40px 0;">
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-value" id="statMembers">0</div>
+                <div class="stat-label">Total Members</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🎟️</div>
+                <div class="stat-value" id="statEvents">0</div>
+                <div class="stat-label">Active Events</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🏆</div>
+                <div class="stat-value" id="statContests">0</div>
+                <div class="stat-label">Upcoming Contests</div>
+            </div>
+        </div>
+
+        <div class="admin-grid">
+            <!-- 2. MANAGE USERS -->
+            <div class="admin-panel">
+                <h3 style="color: var(--primary-color); margin-bottom: 10px;">👥 Manage Users</h3>
+                <div style="overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Actions</th></tr></thead>
+                        <tbody id="usersTableBody"><tr><td colspan="4">Loading users...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3. MANAGE EVENTS -->
+            <div class="admin-panel">
+                <h3 style="color: var(--primary-color); margin-bottom: 10px;">📅 Manage Events</h3>
+                <form id="createEventForm" class="form-grid">
+                    <input type="text" id="evTitle" placeholder="Event Title" class="form-input" required>
+                    <input type="date" id="evDate" class="form-input" required>
+                    <input type="text" id="evLocation" placeholder="Location" class="form-input" required>
+                    <input type="number" id="evCapacity" placeholder="Max Capacity" class="form-input" required>
+                    <textarea id="evDesc" placeholder="Event Description" class="form-textarea full-width" rows="2" required></textarea>
+                    <button type="submit" class="btn btn-primary full-width">Publish Event</button>
+                </form>
+                <div style="margin-top: 20px; overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead><tr><th>Title</th><th>Date</th><th>Location</th><th>Actions</th></tr></thead>
+                        <tbody id="eventsTableBody"><tr><td colspan="4">Loading events...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 4. MANAGE CONTESTS -->
+            <div class="admin-panel">
+                <h3 style="color: var(--primary-color); margin-bottom: 10px;">🏆 Manage Contests</h3>
+                <form id="createContestForm" class="form-grid">
+                    <input type="text" id="conTitle" placeholder="Contest Name" class="form-input full-width" required>
+                    <input type="date" id="conDate" class="form-input" required>
+                    <input type="text" id="conPrize" placeholder="Prize Pool (e.g. $500)" class="form-input" required>
+                    <button type="submit" class="btn btn-primary full-width">Create Contest</button>
+                </form>
+                <div style="margin-top: 20px; overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead><tr><th>Contest Name</th><th>Date</th><th>Prize</th><th>Actions</th></tr></thead>
+                        <tbody id="contestsTableBody"><tr><td colspan="4">Loading contests...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5. POST NEWS -->
+            <div class="admin-panel">
+                <h3 style="color: var(--primary-color); margin-bottom: 10px;">📰 Post News & Announcements</h3>
+                <form id="createNewsForm" style="display: flex; flex-direction: column; gap: 15px;">
+                    <input type="text" id="newsTitle" placeholder="News Headline" class="form-input" required>
+                    <input type="text" id="newsImage" placeholder="Image URL (Optional)" class="form-input">
+                    <textarea id="newsContent" placeholder="Write your announcement here..." class="form-textarea" rows="4" required></textarea>
+                    <button type="submit" class="btn btn-primary">Publish News</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const token = localStorage.getItem('token');
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.clear(); window.location.href = 'login.html';
+        });
+
+        // Load Admin Data (Mocked logic for full structure)
+        async function loadAdminData() {
+            try {
+                // 1. Load Users
+                const userRes = await fetch('http://localhost:5000/api/admin/users', { headers: { 'Authorization': `Bearer ${token}` }});
+                const users = await userRes.json();
+                document.getElementById('statMembers').innerText = users.length || 0;
+                document.getElementById('usersTableBody').innerHTML = users.map(u => `
+                    <tr>
+                        <td>${u.name}</td><td>${u.email}</td><td><span class="tag">${u.role}</span></td>
+                        <td>
+                            ${u.role !== 'admin' ? `<button class="action-btn btn-promote" onclick="promoteUser('${u._id}')">Promote</button>` : ''}
+                            <button class="action-btn btn-delete" onclick="deleteUser('${u._id}')">Delete</button>
+                        </td>
+                    </tr>`).join('');
+
+                // 2. Load Events
+                const eventRes = await fetch('http://localhost:5000/api/events');
+                const events = await eventRes.json();
+                document.getElementById('statEvents').innerText = events.length || 0;
+                document.getElementById('eventsTableBody').innerHTML = events.map(e => `
+                    <tr>
+                        <td>${e.title}</td><td>${e.date}</td><td>${e.location}</td>
+                        <td><button class="action-btn btn-delete" onclick="deleteEvent('${e._id}')">Delete</button></td>
+                    </tr>`).join('');
+                
+                // Similar fetches for Contests and News would go here
+            } catch (err) { console.log('Backend not fully configured yet for all routes.'); }
+        }
+
+        // Create Event Submit
+        document.getElementById('createEventForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            alert("Event creation triggered! (Backend connection required)");
+            document.getElementById('createEventForm').reset();
+        });
+
+        // Create Contest Submit
+        document.getElementById('createContestForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            alert("Contest creation triggered! (Backend connection required)");
+            document.getElementById('createContestForm').reset();
+        });
+
+        // Create News Submit
+        document.getElementById('createNewsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            alert("News published! (Backend connection required)");
+            document.getElementById('createNewsForm').reset();
+        });
+
+        loadAdminData();
+    </script>
+</body>
+</html>

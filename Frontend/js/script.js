@@ -18,6 +18,50 @@ navLink.forEach(link => {
     });
 });
 
+
+// ==================== DYNAMIC NAVBAR AUTHENTICATION ====================
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Get user data from browser memory
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+    const name = localStorage.getItem('name');
+
+    // 2. Get the HTML elements
+    const loginNavItem = document.getElementById('login-nav-item');
+    const profileNavItem = document.getElementById('profile-nav-item');
+    const profileLink = document.getElementById('profile-link');
+    const navUserName = document.getElementById('nav-user-name');
+
+    // 3. Check if user is logged in
+    if (token) {
+        // User IS logged in: Hide Login, Show Profile
+        if (loginNavItem) loginNavItem.style.display = 'none';
+        if (profileNavItem) profileNavItem.style.display = 'block';
+        
+        // Show their first name next to the 👤 icon
+        if (navUserName && name) {
+            navUserName.textContent = name.split(' ')[0]; // Gets just the first name
+        }
+
+        // Set the link destination based on their role
+        if (profileLink) {
+            if (role === 'admin') {
+                profileLink.href = 'admin_dashboard.html';
+            } else {
+                profileLink.href = 'member_dashboard.html';
+            }
+        }
+    } else {
+        // User is NOT logged in: Show Login, Hide Profile
+        if (loginNavItem) loginNavItem.style.display = 'block';
+        if (profileNavItem) profileNavItem.style.display = 'none';
+    }
+});
+
+
+
+
 // ==================== SMOOTH SCROLLING NAVIGATION ====================
 
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
