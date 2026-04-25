@@ -89,62 +89,88 @@
     </section>
 
     <!-- DASHBOARD SCRIPT -->
+
+
+
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const token = localStorage.getItem('token');
-        const userName = localStorage.getItem('userName');
-        
-        // 1. Set Welcome Name immediately from local storage
-        if (userName) {
-            document.getElementById('welcomeName').innerText = userName.split(' ')[0]; // Gets first name
-        }
+document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    const userName = localStorage.getItem('userName');
+    
+    // 1. Set Welcome Name immediately from local storage
+    if (userName) {
+        document.getElementById('welcomeName').innerText = userName.split(' ')[0];
+    }
 
-        // 2. Handle Logout
-        document.getElementById('logoutBtn').addEventListener('click', (e) => {
-            e.preventDefault();
-            localStorage.clear(); // Clears token and user data
-            window.location.href = 'login.html';
-        });
-
-        // 3. Fetch Profile Data from Backend to replace "Loading..."
-        async function loadProfile() {
-            try {
-                const res = await fetch('http://localhost:5000/api/auth/profile', {
-                    method: 'GET',
-                    headers: { 
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (res.ok) {
-                    const userData = await res.json();
-                    
-                    // Inject the real data into the HTML elements
-                    document.getElementById('profileEmail').innerText = userData.email || 'N/A';
-                    document.getElementById('profileId').innerText = userData.studentId || 'N/A';
-                    
-                    if (userData.createdAt) {
-                        document.getElementById('profileDate').innerText = new Date(userData.createdAt).toLocaleDateString();
-                    } else {
-                        document.getElementById('profileDate').innerText = "Unknown";
-                    }
-                } else {
-                    console.error('Session expired or invalid token');
-                    localStorage.clear();
-                    window.location.href = 'login.html';
-                }
-            } catch (err) {
-                console.error('Error fetching profile. Is the backend running?', err);
-                document.getElementById('profileEmail').innerText = "Server Error";
-                document.getElementById('profileId').innerText = "Server Error";
-                document.getElementById('profileDate').innerText = "Server Error";
-            }
-        }
-
-        // Trigger the fetch when page loads
-        loadProfile();
+    // 2. Handle Logout
+    document.getElementById('logoutBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.clear();
+        window.location.href = 'login.html';
     });
-    </script>
+
+    // 3. Fetch Profile Data from Backend
+    async function loadProfile() {
+        if (!token) {
+            console.error('❌ No token found. Redirecting to login...');
+            window.location.href = 'login.html';
+            return;
+        }
+
+        try {
+            const res = await fetch('http://localhost:5000/api/auth/profile', {
+                method: 'GET',
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            const data = await res.json();
+
+            if (res.ok && data.success) {
+                const userData = data.user;
+                
+                // Update welcome message
+                document.getElementById('welcomeName').innerText = userData.name.split(' ')[0];
+                
+                // Update profile information
+                document.getElementById('profileEmail').innerText = userData.email || 'N/A';
+                document.getElementById('profileId').innerText = userData.studentId || 'Not provided';
+                
+                if (userData.createdAt) {
+                    const joinDate = new Date(userData.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    document.getElementById('profileDate').innerText = joinDate;
+                } else {
+                    document.getElementById('profileDate').innerText = "Unknown";
+                }
+
+                console.log('✅ Profile loaded successfully:', userData);
+            } else {
+                console.error('❌ Failed to load profile:', data.message);
+                document.getElementById('profileEmail').innerText = "Failed to load";
+                document.getElementById('profileId').innerText = "Failed to load";
+                document.getElementById('profileDate').innerText = "Failed to load";
+            }
+        } catch (err) {
+            console.error('❌ Error fetching profile:', err.message);
+            alert('Could not load your profile. Make sure the backend server is running on http://localhost:5000');
+            
+            document.getElementById('profileEmail').innerText = "Server Error";
+            document.getElementById('profileId').innerText = "Server Error";
+            document.getElementById('profileDate').innerText = "Server Error";
+        }
+    }
+
+    // Load profile when page loads
+    loadProfile();
+});
+</script>
+
+
 </body>
 </html>

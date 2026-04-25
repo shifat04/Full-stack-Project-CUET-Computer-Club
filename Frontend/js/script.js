@@ -21,11 +21,15 @@ navLink.forEach(link => {
 
 // ==================== DYNAMIC NAVBAR AUTHENTICATION ====================
 
+
+
+// ==================== DYNAMIC NAVBAR AUTHENTICATION ====================
+
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Get user data from browser memory
     const token = localStorage.getItem('token');
-    const role = localStorage.getItem('role');
-    const name = localStorage.getItem('name');
+    const role = localStorage.getItem('userRole');  // ✅ FIXED
+    const name = localStorage.getItem('userName');  // ✅ FIXED
 
     // 2. Get the HTML elements
     const loginNavItem = document.getElementById('login-nav-item');
@@ -41,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Show their first name next to the 👤 icon
         if (navUserName && name) {
-            navUserName.textContent = name.split(' ')[0]; // Gets just the first name
+            navUserName.textContent = name.split(' ')[0];
         }
 
         // Set the link destination based on their role
@@ -58,6 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (profileNavItem) profileNavItem.style.display = 'none';
     }
 });
+
+
 
 
 

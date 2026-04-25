@@ -1,9 +1,10 @@
-// js/protect_member.js
 (function() {
     const token = localStorage.getItem('token');
+    const role = localStorage.getItem('userRole');  // ✅ IMPORTANT
     
-    // If no token exists in the browser, redirect to login immediately
-    if (!token) {
+    // If no token or not admin, redirect
+    if (!token || role !== 'admin') {
+        alert('Admin access only!');
         window.location.replace('login.html');
     }
 })();
