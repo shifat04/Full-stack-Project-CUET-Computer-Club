@@ -241,4 +241,77 @@ router.post('/register', async (req, res) => {
     }
 });
 
+
+
+
+
+
+// ==================== POST Forgot Password ====================
+router.post('/forgot-password', async (req, res) => {
+    try {
+        const { email, newPassword } = req.body;
+ 
+        // Validate input
+        if (!email || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email and new password are required'
+            });
+        }
+ 
+        // Validate email format
+        if (!isValidEmail(email)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid email format'
+            });
+        }
+ 
+        // Validate password strength
+        if (!isValidPassword(newPassword)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Password must be at least 6 characters long'
+            });
+        }
+ 
+        // Check if user exists
+        const user = await User.findOne({ email });
+        if (!user) {
+            console.log(`[Forgot Password Failed] Email not found: ${email}`);
+            return res.status(404).json({
+                success: false,
+                message: 'No account found with this email address'
+            });
+        }
+ 
+        // Hash the new password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+ 
+        // Update password in database
+        await User.findOneAndUpdate(
+            { email },
+            { password: hashedPassword }
+        );
+ 
+        console.log(`[Forgot Password Success] Password reset for: ${email}`);
+ 
+        res.status(200).json({
+            success: true,
+            message: 'Password reset successfully'
+        });
+ 
+    } catch (error) {
+        console.error('[Forgot Password Error]:', error.message);
+        res.status(500).json({
+            success: false,
+            message: 'Server error during password reset'
+        });
+    }
+});
+
+
+
+
 module.exports = router;
