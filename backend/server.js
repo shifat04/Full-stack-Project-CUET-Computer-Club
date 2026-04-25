@@ -9,9 +9,7 @@ const app = express();
 // 1. MIDDLEWARE
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../frontend')));
-
-// ✅ SERVE UPLOADED IMAGES STATICALLY
+app.use(express.static(path.join(__dirname, '../Frontend')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // 2. IMPORT ROUTES
@@ -19,21 +17,25 @@ const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const dataRoutes = require('./routes/dataRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
+const eventRegistrationRoutes = require('./routes/eventRegistrationRoutes');
+const contestRegistrationRoutes = require('./routes/contestRegistrationRoutes');
 
 // 3. USE ROUTES
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/data', dataRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/event-registration', eventRegistrationRoutes);
+app.use('/api/contest-registration', contestRegistrationRoutes);
 
 // 4. CONNECT TO DATABASE
-mongoose.connect("mongodb://127.0.0.1:27017/CUET_Computer_Club")
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ DB connected"))
   .catch(err => console.log("❌ DB Error:", err));
 
 // 5. DEFAULT ROUTE
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/index.html'));
+    res.sendFile(path.join(__dirname, '../Frontend/index.html'));
 });
 
 // 6. START SERVER

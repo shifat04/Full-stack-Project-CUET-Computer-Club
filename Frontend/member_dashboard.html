@@ -5,18 +5,222 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Member Dashboard - CUET Computer Club</title>
     <link rel="stylesheet" href="css/style.css">
-    
-    <!-- This script runs first to protect the page from unlogged users -->
-    <script src="js/protect_member.js"></script>
-    
     <style>
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 30px; }
-        .dash-card { background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border-color); border-radius: 15px; padding: 25px; backdrop-filter: blur(10px); }
-        .dash-card h3 { color: var(--primary-color); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
-        .profile-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
-        .list-item { padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--primary-color); }
-        .resource-link { display: block; padding: 12px; background: var(--border-color); color: var(--light-text); text-decoration: none; border-radius: 8px; margin-bottom: 10px; transition: 0.3s; }
-        .resource-link:hover { background: var(--primary-color); }
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .welcome-section {
+            background: linear-gradient(135deg, var(--primary-color), #7c3aed);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+        }
+
+        .welcome-section h1 {
+            font-size: 2.5rem;
+            margin: 0 0 10px 0;
+        }
+
+        .welcome-section p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .dash-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            transition: all var(--transition-smooth);
+        }
+
+        .dash-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.1);
+        }
+
+        .dash-card h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .profile-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--muted-text);
+        }
+
+        .profile-row strong {
+            color: var(--light-text);
+        }
+
+        .resource-link {
+            display: block;
+            padding: 12px;
+            margin: 10px 0;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary-color);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all var(--transition-smooth);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .resource-link:hover {
+            background: rgba(99, 102, 241, 0.2);
+            padding-left: 15px;
+        }
+
+        .registrations-section {
+            grid-column: 1 / -1;
+        }
+
+        .registration-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .registration-item {
+            background: rgba(99, 102, 241, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-smooth);
+        }
+
+        .registration-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .registration-item h4 {
+            color: var(--light-text);
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .registration-detail {
+            color: var(--muted-text);
+            font-size: 0.95rem;
+            margin: 8px 0;
+        }
+
+        .registration-detail strong {
+            color: var(--light-text);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .status-badge.registered {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+
+        .status-badge.pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning-color);
+            border: 1px solid var(--warning-color);
+        }
+
+        .status-badge.cancelled {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border: 1px solid #ef4444;
+        }
+
+        .cancel-btn {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border: 1px solid #ef4444;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            transition: all var(--transition-smooth);
+        }
+
+        .cancel-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        .cancel-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--muted-text);
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            margin: 10px 0;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all var(--transition-smooth);
+            margin-top: 20px;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-section {
+                padding: 30px;
+            }
+
+            .welcome-section h1 {
+                font-size: 2rem;
+            }
+
+            .registration-list {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -25,40 +229,49 @@
         <div class="navbar-container">
             <div class="navbar-brand">
                 <a href="index.html" class="logo">
-                    <span class="logo-text">Member Portal</span>
+                    <img src="assert/cuet_logo.png" alt="CUET Logo" class="logo-icon">
+                    <span class="logo-text">CUET Computer Club</span>
                 </a>
             </div>
-            <ul class="nav-links">
-                <li><a href="index.html" class="nav-link">Main Website</a></li>
-                <li><a href="#" id="logoutBtn" class="btn btn-primary" style="background: var(--error-color); padding: 8px 15px;">Logout</a></li>
-            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
     </nav>
 
-    <!-- MAIN CONTENT -->
-    <section class="section-container" style="padding-top: 50px; padding-bottom: 50px;">
-        <div class="section-header" style="text-align: left;">
-            <h2 class="section-title">Welcome back, <span id="welcomeName" class="gradient-text">Member</span>!</h2>
-            <p class="section-subtitle">Here is your personal club overview.</p>
+    <!-- MAIN DASHBOARD SECTION -->
+    <section class="dashboard-container">
+        <!-- WELCOME SECTION -->
+        <div class="welcome-section">
+            <h1>👋 Welcome, <span id="welcomeName">Member</span>!</h1>
+            <p>Manage your events and contest registrations here</p>
         </div>
 
+        <!-- DASHBOARD GRID -->
         <div class="dashboard-grid">
-            <!-- 1. PROFILE INFO -->
+            <!-- 1. PROFILE CARD -->
             <div class="dash-card">
                 <h3>👤 My Profile</h3>
                 <div class="profile-row">
-                    <span style="color: var(--muted-text);">Email:</span>
+                    <span>Name:</span>
+                    <strong id="profileName">Loading...</strong>
+                </div>
+                <div class="profile-row">
+                    <span>Email:</span>
                     <strong id="profileEmail">Loading...</strong>
                 </div>
                 <div class="profile-row">
-                    <span style="color: var(--muted-text);">Student ID:</span>
-                    <strong id="profileId">Loading...</strong>
+                    <span>Student ID:</span>
+                    <strong id="profileId">N/A</strong>
                 </div>
                 <div class="profile-row">
-                    <span style="color: var(--muted-text);">Member Since:</span>
+                    <span>Member Since:</span>
                     <strong id="profileDate">Loading...</strong>
                 </div>
                 <button class="btn btn-secondary" style="width: 100%; margin-top: 15px; padding: 8px;">Edit Profile</button>
+                <button class="logout-btn" id="logoutBtn" style="width: 100%;">🚪 Logout</button>
             </div>
 
             <!-- 2. CLUB RESOURCES -->
@@ -71,106 +284,57 @@
                 <a href="#" class="resource-link">🎥 Past Event Recordings</a>
             </div>
 
-            <!-- 3. MY EVENTS -->
-            <div class="dash-card" style="grid-column: 1 / -1;">
-                <h3>📅 My Events</h3>
-                <div id="myEventsList">
-                    <div class="list-item">
-                        <div style="display: flex; justify-content: space-between;">
-                            <h4>Web Development Masterclass</h4>
-                            <span class="tag" style="background: rgba(16, 185, 129, 0.2); color: var(--success-color);">Registered</span>
-                        </div>
-                        <p style="color: var(--muted-text); font-size: 0.9rem; margin-top: 5px;">Date: March 15, 2026 | Location: Auditorium Hall</p>
+            <!-- 3. QUICK STATS -->
+            <div class="dash-card">
+                <h3>📊 Your Activity</h3>
+                <div class="profile-row">
+                    <span>Events Registered:</span>
+                    <strong id="eventCount" style="color: var(--primary-color);">0</strong>
+                </div>
+                <div class="profile-row">
+                    <span>Contests Registered:</span>
+                    <strong id="contestCount" style="color: var(--primary-color);">0</strong>
+                </div>
+                <div class="profile-row">
+                    <span>Total Amount Spent:</span>
+                    <strong id="totalSpent" style="color: var(--primary-color);">৳0</strong>
+                </div>
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color);">
+                    <p style="color: var(--muted-text); font-size: 0.9rem; margin: 0;">
+                        Keep participating and earning badges! 🏆
+                    </p>
+                </div>
+            </div>
+
+            <!-- 4. MY EVENTS -->
+            <div class="dash-card registrations-section">
+                <h3>📅 My Event Registrations</h3>
+                <div class="registration-list" id="myEventsList">
+                    <div class="empty-state">
+                        <p>📭 No event registrations yet</p>
+                        <p style="font-size: 0.9rem;"><a href="index.html#events" style="color: var(--primary-color);">Browse events →</a></p>
                     </div>
                 </div>
-                <p style="text-align: center; margin-top: 15px;"><a href="index.html#events" style="color: var(--primary-color);">Browse more events</a></p>
+            </div>
+
+            <!-- 5. MY CONTESTS -->
+            <div class="dash-card registrations-section">
+                <h3>🏆 My Contest Registrations</h3>
+                <div class="registration-list" id="myContestsList">
+                    <div class="empty-state">
+                        <p>🎯 No contest registrations yet</p>
+                        <p style="font-size: 0.9rem;"><a href="index.html#contests" style="color: var(--primary-color);">Browse contests →</a></p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- DASHBOARD SCRIPT -->
+    <!-- THEME TOGGLE -->
+    <button class="theme-toggle" id="themeToggle" title="Toggle Dark/Light Mode">🌙</button>
 
-
-
-    <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('token');
-    const userName = localStorage.getItem('userName');
-    
-    // 1. Set Welcome Name immediately from local storage
-    if (userName) {
-        document.getElementById('welcomeName').innerText = userName.split(' ')[0];
-    }
-
-    // 2. Handle Logout
-    document.getElementById('logoutBtn').addEventListener('click', (e) => {
-        e.preventDefault();
-        localStorage.clear();
-        window.location.href = 'login.html';
-    });
-
-    // 3. Fetch Profile Data from Backend
-    async function loadProfile() {
-        if (!token) {
-            console.error('❌ No token found. Redirecting to login...');
-            window.location.href = 'login.html';
-            return;
-        }
-
-        try {
-            const res = await fetch('http://localhost:5000/api/auth/profile', {
-                method: 'GET',
-                headers: { 
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            const data = await res.json();
-
-            if (res.ok && data.success) {
-                const userData = data.user;
-                
-                // Update welcome message
-                document.getElementById('welcomeName').innerText = userData.name.split(' ')[0];
-                
-                // Update profile information
-                document.getElementById('profileEmail').innerText = userData.email || 'N/A';
-                document.getElementById('profileId').innerText = userData.studentId || 'Not provided';
-                
-                if (userData.createdAt) {
-                    const joinDate = new Date(userData.createdAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
-                    document.getElementById('profileDate').innerText = joinDate;
-                } else {
-                    document.getElementById('profileDate').innerText = "Unknown";
-                }
-
-                console.log('✅ Profile loaded successfully:', userData);
-            } else {
-                console.error('❌ Failed to load profile:', data.message);
-                document.getElementById('profileEmail').innerText = "Failed to load";
-                document.getElementById('profileId').innerText = "Failed to load";
-                document.getElementById('profileDate').innerText = "Failed to load";
-            }
-        } catch (err) {
-            console.error('❌ Error fetching profile:', err.message);
-            alert('Could not load your profile. Make sure the backend server is running on http://localhost:5000');
-            
-            document.getElementById('profileEmail').innerText = "Server Error";
-            document.getElementById('profileId').innerText = "Server Error";
-            document.getElementById('profileDate').innerText = "Server Error";
-        }
-    }
-
-    // Load profile when page loads
-    loadProfile();
-});
-</script>
-
-
+    <!-- SCRIPTS -->
+    <script src="js/script.js"></script>
+    <script src="js/member-dashboard.js"></script>
 </body>
 </html>

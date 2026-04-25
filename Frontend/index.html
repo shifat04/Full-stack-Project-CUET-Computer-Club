@@ -591,6 +591,8 @@
 
 
     <script>
+
+
 // ==================== LOAD EVENTS ====================
 async function loadEvents() {
     try {
@@ -645,12 +647,29 @@ async function loadEvents() {
                             <span>👥 ${event.participants ? event.participants.length : 0} Attendees</span>
                             <span>⭐ 4.8/5 Rating</span>
                         </div>
-                        <button 
-                            onclick="registerEvent('${event._id}')" 
-                            class="btn btn-primary" 
-                            style="width: 100%; margin-top: 10px; border: none; cursor: pointer;">
-                            Register Event
-                        </button>
+                      
+                      ${event.registrationFee && event.registrationFee > 0 ? `
+    <div style="background: rgba(99, 102, 241, 0.1); padding: 10px; border-radius: 8px; margin: 10px 0; text-align: center; color: var(--primary-color); font-weight: 600;">
+        💰 ৳${event.registrationFee}
+    </div>
+    <button 
+        onclick="window.location.href='./event-registration.html?eventId=${event._id}'" 
+        class="btn btn-primary" 
+        style="width: 100%; margin-top: 10px; border: none; cursor: pointer;">
+        Register Event
+    </button>
+` : `
+    <button 
+        onclick="registerEvent('${event._id}')" 
+        class="btn btn-primary" 
+        style="width: 100%; margin-top: 10px; border: none; cursor: pointer;">
+        Register Event
+    </button>
+`}
+                      
+                      
+                      
+                      
                     </div>
                 `;
 
@@ -744,12 +763,26 @@ async function loadContests() {
                         ${(contest.tags || ['Competition']).map(tag => `<span class="tag">${tag}</span>`).join('')}
                     </div>
 
-                    <button 
-                        onclick="registerContest('${contest._id}')" 
-                        class="btn btn-primary" 
-                        style="width: 100%; text-align: center; border: none; cursor: pointer; margin-top: 15px;">
-                        Register Now
-                    </button>
+                ${contest.registrationFee && contest.registrationFee > 0 ? `
+    <div style="background: rgba(99, 102, 241, 0.1); padding: 10px; border-radius: 8px; margin: 10px 0; text-align: center; color: var(--primary-color); font-weight: 600;">
+        💰 ৳${contest.registrationFee}
+    </div>
+    <button 
+        onclick="window.location.href='./contest-registration.html?contestId=${contest._id}'" 
+        class="btn btn-primary" 
+        style="width: 100%; text-align: center; border: none; cursor: pointer; margin-top: 15px;">
+        Register Now
+    </button>
+` : `
+    <button 
+        onclick="registerContest('${contest._id}')" 
+        class="btn btn-primary" 
+        style="width: 100%; text-align: center; border: none; cursor: pointer; margin-top: 15px;">
+        Register Now
+    </button>
+`}
+
+
                 `;
 
                 container.appendChild(card);
